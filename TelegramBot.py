@@ -2,6 +2,8 @@ import os
 import requests
 from flask import Flask, request
 
+# https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=https://<YOUR_RENDER_SERVICE_URL>
+
 app = Flask(__name__)
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -26,5 +28,4 @@ def send_message(chat_id, text):
     requests.post(BASE_URL, json=payload)
 
 if __name__ == '__main__':
-    
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
