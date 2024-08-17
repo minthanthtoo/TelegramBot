@@ -45,7 +45,7 @@ def ask(update, context):
 
 def chat_with_openai(prompt):
     try:
-        response = openai.Completion.create(
+        response = openai.ChatCompletion.create(
             engine="text-davinci-003",  # or "gpt-4" if you have access
             prompt=prompt,
             max_tokens=150,
