@@ -28,12 +28,15 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Command Handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("/start")
     await update.message.reply_text("Hello! I'm your AI-powered bot. Use /help to see available commands.")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("/help")
     await update.message.reply_text("/start - Welcome message\n/help - List of commands\n/echo - Echo your message\n/ask - Ask me anything")
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("/echo")
     text_to_echo = ' '.join(context.args)  # Get the message after the /echo command
     if text_to_echo:
         await update.message.reply_text(text_to_echo)
@@ -41,6 +44,7 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("You didn't provide any text to echo!")
 
 async def ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    print("/ask")
     user_question = ' '.join(context.args)  # Get the question after the /ask command
     if user_question:
         response = chat_with_openai(user_question)
@@ -71,7 +75,7 @@ application.add_handler(CommandHandler("ask", ask))
 def webhook():
     if request.method == "POST":
         update = Update.de_json(request.get_json(force=True), bot)
-        application.process_update(update)
+        application.update_queue.put(update)
     return "OK", 200
 
 if __name__ == '__main__':
