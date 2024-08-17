@@ -1,5 +1,5 @@
 Flask
-dotenv
+python-dotenv
 requests
 python-telegram-bot==20.3
 openai
