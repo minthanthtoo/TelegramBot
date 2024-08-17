@@ -40,7 +40,7 @@ async def ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def chat_with_openai(prompt):
     try:
-        response = openai.ChatCompletion.create(
+        response = openai.chats.completion.create(
             model="gpt-3.5-turbo",  # or "gpt-4" if you have access
             messages=[{"role": "user", "content": prompt}],
             max_tokens=150,
