@@ -2,71 +2,66 @@
 # https://github.com
 # https://dashboard.render.com
 # https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=https://<YOUR_RENDER_SERVICE_URL>
-
 import os
 from flask import Flask, request
-import telegram
-from telegram.ext import CommandHandler, Dispatcher
-import openai
+from telegram import Update, Bot
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
 app = Flask(__name__)
 
-# Set up OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
 # Your bot's token from BotFather
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-bot = telegram.Bot(token=BOT_TOKEN)
+TOKEN = os.getenv("BOT_TOKEN")
 
-# Initialize the dispatcher to handle commands
-dispatcher = Dispatcher(bot, None, workers=0, use_context=True)
+# Initialize the bot and application
+bot = Bot(token=TOKEN)
+application = Application.builder().token(TOKEN).build()
 
 # Command Handlers
-def start(update, context):
-    update.message.reply_text("Hello! I'm your bot. Use /help to see available commands.")
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Hello! I'm your AI-powered bot. Use /help to see available commands.")
 
-def help_command(update, context):
-    update.message.reply_text("/start - Welcome message\n/help - List of commands\n/echo - Echo your message\n/ask - Ask me anything")
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("/start - Welcome message\n/help - List of commands\n/echo - Echo your message\n/ask - Ask me anything")
 
-def echo(update, context):
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text_to_echo = ' '.join(context.args)  # Get the message after the /echo command
     if text_to_echo:
-        update.message.reply_text(text_to_echo)
+        await update.message.reply_text(text_to_echo)
     else:
-        update.message.reply_text("You didn't provide any text to echo!")
+        await update.message.reply_text("You didn't provide any text to echo!")
 
-def ask(update, context):
+async def ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_question = ' '.join(context.args)  # Get the question after the /ask command
     if user_question:
         response = chat_with_openai(user_question)
-        update.message.reply_text(response)
+        await update.message.reply_text(response)
     else:
-        update.message.reply_text("You didn't ask anything!")
+        await update.message.reply_text("You didn't ask anything!")
 
 def chat_with_openai(prompt):
     try:
         response = openai.ChatCompletion.create(
-            engine="text-davinci-003",  # or "gpt-4" if you have access
-            prompt=prompt,
+            model="gpt-3.5-turbo",  # or "gpt-4" if you have access
+            messages=[{"role": "user", "content": prompt}],
             max_tokens=150,
             temperature=0.7,
         )
-        return response.choices[0].text.strip()
+        return response.choices[0].message['content'].strip()
     except Exception as e:
-        return f"Error: {str(e)}"# Add handlers to dispatcher
-        
-# Add handlers to dispatcher
-dispatcher.add_handler(CommandHandler("start", start))
-dispatcher.add_handler(CommandHandler("help", help_command))
-dispatcher.add_handler(CommandHandler("echo", echo))
-dispatcher.add_handler(CommandHandler("ask", ask))
+        return f"Error: {str(e)}"
+
+# Add handlers to application
+application.add_handler(CommandHandler("start", start))
+application.add_handler(CommandHandler("help", help_command))
+application.add_handler(CommandHandler("echo", echo))
+application.add_handler(CommandHandler("ask", ask))
 
 # Flask route to handle incoming webhooks
 @app.route('/', methods=['POST'])
 def webhook():
     if request.method == "POST":
-        update = telegram.Update.de_json(request.get_json(force=True), bot)
-        dispatcher.process_update(update)
+        update = Update.de_json(request.get_json(force=True), bot)
+        application.update_queue.put(update)
     return "OK", 200
 
 if __name__ == '__main__':
