@@ -1,4 +1,4 @@
 Flask
 requests
-python-telegram-bot==13.7
+python-telegram-bot==20.3
 openai
