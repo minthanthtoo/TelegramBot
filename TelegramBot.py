@@ -26,7 +26,7 @@ def start(update, context):
     update.message.reply_text("Hello! I'm your bot. Use /help to see available commands.")
 
 def help_command(update, context):
-    update.message.reply_text("/start - Welcome message\n/help - List of commands\n/echo - Echo your message")
+    update.message.reply_text("/start - Welcome message\n/help - List of commands\n/echo - Echo your message\n/ask - Ask me anything")
 
 def echo(update, context):
     text_to_echo = ' '.join(context.args)  # Get the message after the /echo command
