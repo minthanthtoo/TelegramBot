@@ -6,15 +6,20 @@ import os
 from flask import Flask, request
 from telegram import Update, Bot
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-
+# importing necessary functions from dotenv library
+from dotenv import load_dotenv, dotenv_values 
 app = Flask(__name__)
 
+load_dotenv()  # take environment variables from .env.
 # Your bot's token from BotFather
 TOKEN = os.getenv("BOT_TOKEN")
 
-# Initialize the bot and application
+# Initi                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     alize the bot and application
 bot = Bot(token=TOKEN)
 application = Application.builder().token(TOKEN).build()
+
+# printout env values
+print("ENV:",os.getenv("BOT_TOKEN"),os.getenv("OPENAI_API_KEY"))
 
 # Command Handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
