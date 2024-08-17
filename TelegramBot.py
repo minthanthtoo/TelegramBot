@@ -6,6 +6,8 @@ import os
 from flask import Flask, request
 from telegram import Update, Bot
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+import openai
+
 # importing necessary functions from dotenv library
 from dotenv import load_dotenv, dotenv_values 
 app = Flask(__name__)
@@ -20,6 +22,9 @@ application = Application.builder().token(TOKEN).build()
 
 # printout env values
 print("ENV:",os.getenv("BOT_TOKEN"),os.getenv("OPENAI_API_KEY"))
+
+# Set up OpenAI API key
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Command Handlers
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -66,7 +71,7 @@ application.add_handler(CommandHandler("ask", ask))
 def webhook():
     if request.method == "POST":
         update = Update.de_json(request.get_json(force=True), bot)
-        application.update_queue.put(update)
+        application.process_update(update)
     return "OK", 200
 
 if __name__ == '__main__':
