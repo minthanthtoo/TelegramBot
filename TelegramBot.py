@@ -8,6 +8,10 @@ from telegram import Update, Bot
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 import openai
 
+# call keep_alive.py
+from keep_alive import keep_alive
+keep_alive ()
+
 # importing necessary functions from dotenv library
 from dotenv import load_dotenv, dotenv_values 
 app = Flask(__name__)
